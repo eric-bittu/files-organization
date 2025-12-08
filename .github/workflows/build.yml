@@ -1,0 +1,37 @@
+name: Build Executables
+
+on:
+  push:
+    branches: [ "main" ] # Ou "master", dependendo do seu branch principal
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest] # Cria duas máquinas virtuais
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12' # Ajuste para sua versão se necessário
+
+    - name: Install Dependencies
+      run: |
+        pip install pyinstaller
+        # Se tiver outras dependências, instale aqui (ex: pip install requests)
+        # pip install -r requirements.txt
+
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --onefile interface.py
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: executavel-${{ matrix.os }}
+        path: dist/
